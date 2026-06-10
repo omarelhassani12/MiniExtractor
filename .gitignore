@@ -1,0 +1,17 @@
+# Go build output
+/bin/
+/dist/
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# Local app state
+shortcuts.txt
+
+# IDE settings
+.vscode/
+.idea/

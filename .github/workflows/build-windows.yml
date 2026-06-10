@@ -1,0 +1,37 @@
+name: Build Windows app
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.x"
+
+      - name: Build Mini Extractor
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path dist\MiniExtractor-Portable\assets | Out-Null
+          go build -trimpath -ldflags "-H windowsgui -s -w" -o dist\MiniExtractor-Portable\MiniExtractor.exe .
+          Copy-Item ocr.ps1 dist\MiniExtractor-Portable\ocr.ps1
+          Copy-Item assets\app_icon.ico dist\MiniExtractor-Portable\assets\app_icon.ico
+          Copy-Item assets\eyedropper.cur dist\MiniExtractor-Portable\assets\eyedropper.cur
+          Copy-Item README.md dist\MiniExtractor-Portable\README.md
+          Compress-Archive -Path dist\MiniExtractor-Portable\* -DestinationPath dist\MiniExtractor-Portable-Windows.zip
+
+      - name: Upload portable build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiniExtractor-Portable-Windows
+          path: dist/MiniExtractor-Portable-Windows.zip
